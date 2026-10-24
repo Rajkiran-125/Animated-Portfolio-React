@@ -112,7 +112,7 @@ export function Hero({ ready }: { ready: boolean }) {
     <section
       id="home"
       ref={scope}
-      data-theme="paper"
+      data-surface="paper"
       className="grid-paper relative isolate flex h-[100svh] min-h-[720px] flex-col overflow-hidden outline-none"
       aria-label="Introduction"
     >
@@ -127,7 +127,7 @@ export function Hero({ ready }: { ready: boolean }) {
         {/* meta row */}
         <div className="label relative z-20 flex items-start justify-between gap-4 text-ink" data-hero-fade>
           <span className="max-w-[16ch] leading-relaxed">
-            <span className="text-crimson">●</span> {profile.role}
+            <span className="text-accent">●</span> {profile.role}
           </span>
           <span className="hidden text-center leading-relaxed sm:block">
             {profile.yearsExperience} years
@@ -143,7 +143,7 @@ export function Hero({ ready }: { ready: boolean }) {
         {/* giant name — layered over the 3D scene, which arranges itself around it */}
         <div
           ref={name}
-          className="pointer-events-none relative z-[15] mt-[5vh] select-none text-crimson md:mt-[3vh]"
+          className="pointer-events-none relative z-[15] mt-[5vh] select-none text-accent md:mt-[3vh]"
           aria-hidden="true"
         >
           <div data-hero-line="1" className="display text-[min(23vw,30vh)] md:text-[min(17vw,19.5vh)]">
@@ -189,7 +189,7 @@ export function Hero({ ready }: { ready: boolean }) {
             {/* no backdrop-blur here: over a live canvas it re-blurs every frame */}
             <div ref={tag} className="label rounded-sm bg-paper/90 px-3 py-2 text-right leading-relaxed text-ash">
               {tier !== 'none' && (
-                <span className="mb-1 hidden items-center justify-end gap-2 text-crimson lg:flex">
+                <span className="mb-1 hidden items-center justify-end gap-2 text-accent lg:flex">
                   <MousePointerClick size={13} /> Click the floating windows
                 </span>
               )}
@@ -221,10 +221,10 @@ export function Hero({ ready }: { ready: boolean }) {
         </div>
       </div>
 
-      {/* torn edge into the crimson skills band */}
+      {/* torn edge into the accent skills band */}
       <div ref={band} className="relative z-20 -mb-px">
-        <TornEdge className="text-crimson" seed={11} />
-        <div className="on-crimson bg-crimson py-3 text-paper md:py-4" data-theme="crimson">
+        <TornEdge className="text-accent" seed={11} />
+        <div className="on-accent bg-accent py-3 text-paper md:py-4" data-surface="accent">
           <Marquee
             items={marqueeWords}
             duration={36}

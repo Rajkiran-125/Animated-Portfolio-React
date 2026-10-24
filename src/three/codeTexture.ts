@@ -1,4 +1,5 @@
 import { CanvasTexture, SRGBColorSpace } from 'three';
+import type { CodePalette } from '@/theme/themes';
 
 export interface Snippet {
   title: string;
@@ -7,35 +8,23 @@ export interface Snippet {
 
 const KEYWORDS =
   /\b(import|from|export|default|const|let|await|async|return|new|class|SELECT|FROM|JOIN|ON|AS|GROUP|BY|WHERE|COUNT)\b/;
-const PALETTE = {
-  bg: '#141010',
-  bar: '#1f1919',
-  text: '#efe7da',
-  keyword: '#ff4b53',
-  string: '#f2c14e',
-  comment: '#7d716a',
-  punct: '#b9ada0',
-  prompt: '#ff4b53',
-  ok: '#9ad18b',
-};
-
 type Token = { text: string; color: string };
 
 /** Tiny highlighter — enough to make code read as code at a glance. */
-function tokenize(line: string): Token[] {
-  if (/^\s*(\/\/|--)/.test(line)) return [{ text: line, color: PALETTE.comment }];
-  if (line.startsWith('$')) return [{ text: line, color: PALETTE.prompt }];
-  if (line.startsWith('✓')) return [{ text: line, color: PALETTE.ok }];
+function tokenize(line: string, palette: CodePalette): Token[] {
+  if (/^\s*(\/\/|--)/.test(line)) return [{ text: line, color: palette.comment }];
+  if (line.startsWith('$')) return [{ text: line, color: palette.keyword }];
+  if (line.startsWith('✓')) return [{ text: line, color: palette.ok }];
   const out: Token[] = [];
   const re = /('[^']*'|"[^"]*"|`[^`]*`|\b\w+\b|\s+|[^\w\s])/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(line))) {
     const t = m[0];
-    let color = PALETTE.text;
-    if (/^['"`]/.test(t)) color = PALETTE.string;
-    else if (KEYWORDS.test(t) && /^\w+$/.test(t)) color = PALETTE.keyword;
-    else if (/^[^\w\s]$/.test(t)) color = PALETTE.punct;
-    else if (/^@\w*/.test(t)) color = PALETTE.keyword;
+    let color = palette.text;
+    if (/^['"`]/.test(t)) color = palette.string;
+    else if (KEYWORDS.test(t) && /^\w+$/.test(t)) color = palette.keyword;
+    else if (/^[^\w\s]$/.test(t)) color = palette.punct;
+    else if (/^@\w*/.test(t)) color = palette.keyword;
     out.push({ text: t, color });
   }
   return out;
@@ -46,13 +35,14 @@ interface Options {
   height: number;
   fontSize: number;
   chrome?: boolean;
+  palette: CodePalette;
 }
 
 /**
  * A canvas-backed texture for code windows. `draw(progress)` reveals the
  * snippet character by character, so the monitor can "type" without React.
  */
-export function createCodeTexture(initial: Snippet, { width, height, fontSize, chrome = true }: Options) {
+export function createCodeTexture(initial: Snippet, { width, height, fontSize, chrome = true, palette: initialPalette }: Options) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -62,6 +52,7 @@ export function createCodeTexture(initial: Snippet, { width, height, fontSize, c
   texture.anisotropy = 4;
 
   let snippet = initial;
+  let palette = initialPalette;
   let total = snippet.lines.reduce((n, l) => n + l.length + 1, 0);
   const lineH = fontSize * 1.55;
   const barH = chrome ? fontSize * 2.4 : 0;
@@ -69,20 +60,20 @@ export function createCodeTexture(initial: Snippet, { width, height, fontSize, c
   const font = `500 ${fontSize}px "JetBrains Mono", ui-monospace, monospace`;
 
   const draw = (progress = 1, caret = true) => {
-    ctx.fillStyle = PALETTE.bg;
+    ctx.fillStyle = palette.bg;
     ctx.fillRect(0, 0, width, height);
 
     if (chrome) {
-      ctx.fillStyle = PALETTE.bar;
+      ctx.fillStyle = palette.bar;
       ctx.fillRect(0, 0, width, barH);
-      ['#e21b23', '#efe7da', '#6b605a'].forEach((c, i) => {
+      palette.dots.forEach((c, i) => {
         ctx.fillStyle = c;
         ctx.beginPath();
         ctx.arc(pad + i * fontSize * 1.3, barH / 2, fontSize * 0.36, 0, Math.PI * 2);
         ctx.fill();
       });
       ctx.font = `500 ${fontSize * 0.85}px "JetBrains Mono", ui-monospace, monospace`;
-      ctx.fillStyle = PALETTE.punct;
+      ctx.fillStyle = palette.punct;
       ctx.textBaseline = 'middle';
       ctx.fillText(snippet.title, pad + fontSize * 4.4, barH / 2);
     }
@@ -96,10 +87,10 @@ export function createCodeTexture(initial: Snippet, { width, height, fontSize, c
       if (budget <= 0) return;
       const y = barH + pad * 0.8 + row * lineH;
       // gutter line numbers
-      ctx.fillStyle = PALETTE.comment;
+      ctx.fillStyle = palette.comment;
       ctx.fillText(String(row + 1).padStart(2, ' '), pad * 0.5, y);
       let x = pad * 0.5 + fontSize * 2.2;
-      for (const tok of tokenize(line)) {
+      for (const tok of tokenize(line, palette)) {
         if (budget <= 0) break;
         const text = tok.text.slice(0, budget);
         budget -= text.length;
@@ -113,7 +104,7 @@ export function createCodeTexture(initial: Snippet, { width, height, fontSize, c
     });
     // block caret
     if (caret) {
-      ctx.fillStyle = PALETTE.keyword;
+      ctx.fillStyle = palette.keyword;
       ctx.fillRect(cursorX + 2, cursorY, fontSize * 0.55, fontSize * 1.1);
     }
     texture.needsUpdate = true;
@@ -124,8 +115,13 @@ export function createCodeTexture(initial: Snippet, { width, height, fontSize, c
     total = snippet.lines.reduce((n, l) => n + l.length + 1, 0);
   };
 
+  /** New colours (theme change) — applied on the next draw. */
+  const setPalette = (next: CodePalette) => {
+    palette = next;
+  };
+
   draw(0);
-  return { texture, draw, setSnippet, dispose: () => texture.dispose() };
+  return { texture, draw, setSnippet, setPalette, dispose: () => texture.dispose() };
 }
 
 export const MONITOR_SNIPPET: Snippet = {

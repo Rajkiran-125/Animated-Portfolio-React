@@ -3,6 +3,7 @@ import { Cursor } from '@/components/layout/Cursor';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
 import { Preloader } from '@/components/layout/Preloader';
+import { ResumeDialog } from '@/components/layout/ResumeDialog';
 import { WhatsappButton } from '@/components/layout/WhatsappButton';
 import { About } from '@/sections/About';
 import { Contact } from '@/sections/Contact';
@@ -53,6 +54,7 @@ export default function App() {
       </main>
       <Footer />
       <WhatsappButton ready={ready} />
+      <ResumeDialog />
       <div className="grain" aria-hidden="true" />
     </>
   );

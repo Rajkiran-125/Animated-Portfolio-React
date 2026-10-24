@@ -3,17 +3,17 @@ interface Props {
   className?: string;
   ring?: string;
   spin?: boolean;
-  tone?: 'crimson' | 'paper' | 'ink';
+  tone?: 'accent' | 'paper' | 'ink';
 }
 
 const tones = {
-  crimson: { bg: 'rgb(var(--crimson))', fg: 'rgb(var(--paper))' },
-  paper: { bg: 'rgb(var(--paper))', fg: 'rgb(var(--crimson))' },
+  accent: { bg: 'rgb(var(--accent))', fg: 'rgb(var(--paper))' },
+  paper: { bg: 'rgb(var(--paper))', fg: 'rgb(var(--accent))' },
   ink: { bg: 'rgb(var(--ink))', fg: 'rgb(var(--paper))' },
 };
 
 /** The "RJ" crest — a circular, mon-inspired monogram with orbiting caption. */
-export function Crest({ size = 140, className = '', ring = 'FULL STACK DEVELOPER • MUMBAI • EST. 2023 • ', spin = true, tone = 'crimson' }: Props) {
+export function Crest({ size = 140, className = '', ring = 'FULL STACK DEVELOPER • MUMBAI • EST. 2023 • ', spin = true, tone = 'accent' }: Props) {
   const { bg, fg } = tones[tone];
   const id = `crest-path-${tone}-${size}`;
   // Only default to `relative` when the caller hasn't positioned it — Tailwind emits

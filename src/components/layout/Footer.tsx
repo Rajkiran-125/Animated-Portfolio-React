@@ -34,9 +34,9 @@ export function Footer() {
   });
 
   return (
-    <footer ref={scope} data-theme="crimson" className="on-crimson relative bg-crimson text-paper">
+    <footer ref={scope} data-surface="accent" className="on-accent relative bg-accent text-paper">
       <div className="bg-ink">
-        <TornEdge className="text-crimson" seed={42} />
+        <TornEdge className="text-accent" seed={42} />
       </div>
       <div className="frame pb-6 pt-10 md:pt-16">
         <div className="grid gap-10 md:grid-cols-12">
@@ -82,7 +82,7 @@ export function Footer() {
                     rel="noopener noreferrer"
                     aria-label={`${s.label} (opens in a new tab)`}
                     whileHover={{ y: -4, rotate: -8 }}
-                    className="grid h-12 w-12 place-items-center rounded-full border border-paper/40 transition-colors hover:bg-paper hover:text-crimson"
+                    className="grid h-12 w-12 place-items-center rounded-full border border-paper/40 transition-colors hover:bg-paper hover:text-accent"
                   >
                     <Icon size={20} />
                   </motion.a>

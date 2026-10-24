@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Check, Copy, Download, Send } from 'lucide-react';
+import { Check, Copy, Download, FileText, Send } from 'lucide-react';
 import { useRef, useState, type FormEvent } from 'react';
 import { useGsap } from '@/animations/useGsap';
 import { registerReveals } from '@/animations/reveals';
@@ -10,6 +10,7 @@ import { SplitWords } from '@/components/ui/SplitWords';
 import { Crest } from '@/components/ui/Crest';
 import { profile, socials } from '@/data/profile';
 import { gsap } from '@/lib/gsap';
+import { openResume } from '@/lib/resume';
 
 type Errors = Partial<Record<'name' | 'email' | 'message', string>>;
 type Status = 'idle' | 'sending' | 'sent' | 'error';
@@ -27,7 +28,7 @@ function validate(data: FormData): Errors {
 
 function Field({ id, label, error, textarea, type = 'text', autoComplete }: { id: 'name' | 'email' | 'message'; label: string; error?: string; textarea?: boolean; type?: string; autoComplete?: string }) {
   const cls =
-    'peer w-full border-b-2 border-paper/25 bg-transparent pb-3 pt-7 text-lg text-paper outline-none transition-colors placeholder:text-transparent focus:border-crimson';
+    'peer w-full border-b-2 border-paper/25 bg-transparent pb-3 pt-7 text-lg text-paper outline-none transition-colors placeholder:text-transparent focus:border-accent';
   return (
     <div className="relative">
       {textarea ? (
@@ -37,7 +38,7 @@ function Field({ id, label, error, textarea, type = 'text', autoComplete }: { id
       )}
       <label
         htmlFor={id}
-        className="label pointer-events-none absolute left-0 top-1 text-paper/60 transition-all peer-placeholder-shown:top-8 peer-placeholder-shown:text-base peer-placeholder-shown:normal-case peer-placeholder-shown:tracking-normal peer-focus:top-1 peer-focus:text-[0.7rem] peer-focus:uppercase peer-focus:tracking-[0.18em] peer-focus:text-crimson"
+        className="label pointer-events-none absolute left-0 top-1 text-paper/60 transition-all peer-placeholder-shown:top-8 peer-placeholder-shown:text-base peer-placeholder-shown:normal-case peer-placeholder-shown:tracking-normal peer-focus:top-1 peer-focus:text-[0.7rem] peer-focus:uppercase peer-focus:tracking-[0.18em] peer-focus:text-accent"
       >
         {label}
       </label>
@@ -49,7 +50,7 @@ function Field({ id, label, error, textarea, type = 'text', autoComplete }: { id
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="mt-2 text-sm text-crimson"
+            className="mt-2 text-sm text-accent"
           >
             {error}
           </motion.p>
@@ -129,16 +130,16 @@ export function Contact() {
   const whatsapp = socials.find((s) => s.label === 'WhatsApp')!;
 
   return (
-    <section id="contact" ref={scope} data-theme="ink" className="relative overflow-hidden bg-ink pb-24 pt-24 text-paper outline-none md:pb-32 md:pt-36" aria-labelledby="contact-title">
-      {/* cinematic crimson floor glow */}
+    <section id="contact" ref={scope} data-surface="ink" className="relative overflow-hidden bg-ink pb-24 pt-24 text-paper outline-none md:pb-32 md:pt-36" aria-labelledby="contact-title">
+      {/* cinematic accent floor glow */}
       <div
-        className="contact-glow pointer-events-none absolute -bottom-1/3 left-1/2 h-[80vh] w-[140vw] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(var(--crimson)/0.55),rgb(var(--crimson-deep)/0.25)_55%,transparent)]"
+        className="contact-glow pointer-events-none absolute -bottom-1/3 left-1/2 h-[80vh] w-[140vw] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(var(--accent)/0.55),rgb(var(--accent-deep)/0.25)_55%,transparent)]"
         aria-hidden="true"
       />
 
       <div className="frame relative">
         <Crest size={190} className="absolute right-[var(--gutter)] top-0 hidden lg:block" ring="SAY HELLO • OPEN TO WORK • SAY HELLO • OPEN TO WORK • " />
-        <SectionLabel index="05" title="Contact" className="text-crimson" />
+        <SectionLabel index="05" title="Contact" className="text-accent" />
         <h2 id="contact-title" className="display mt-8 text-[clamp(3.8rem,12vw,12rem)]" data-split>
           <SplitWords text="Let's build something" accent={['something']} />
         </h2>
@@ -154,12 +155,12 @@ export function Contact() {
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <a href={`mailto:${profile.email}`} className="group relative break-all text-[clamp(1.25rem,2.4vw,1.9rem)] font-semibold">
                   {profile.email}
-                  <span className="absolute -bottom-1 left-0 h-[2px] w-full origin-right scale-x-0 bg-crimson transition-transform duration-500 group-hover:origin-left group-hover:scale-x-100" />
+                  <span className="absolute -bottom-1 left-0 h-[2px] w-full origin-right scale-x-0 bg-accent transition-transform duration-500 group-hover:origin-left group-hover:scale-x-100" />
                 </a>
                 <button
                   type="button"
                   onClick={copy}
-                  className="relative grid h-11 w-11 place-items-center rounded-full border border-paper/25 transition-colors hover:border-crimson hover:bg-crimson"
+                  className="relative grid h-11 w-11 place-items-center rounded-full border border-paper/25 transition-colors hover:border-accent hover:bg-accent"
                   aria-label={copied ? 'Email copied' : 'Copy email address'}
                 >
                   <AnimatePresence mode="wait" initial={false}>
@@ -176,19 +177,17 @@ export function Contact() {
 
             <ul className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {[
-                { href: whatsapp.href, label: 'WhatsApp', sub: whatsapp.handle, Icon: WhatsappIcon, external: true },
-                { href: linkedin.href, label: 'LinkedIn', sub: linkedin.handle, Icon: LinkedinIcon, external: true },
-                { href: github.href, label: 'GitHub', sub: github.handle, Icon: GithubIcon, external: true },
-                { href: profile.resumeUrl, label: 'Résumé', sub: 'PDF · 77 KB', Icon: Download, external: false },
-              ].map(({ href, label, sub, Icon, external }) => (
+                { href: whatsapp.href, label: 'WhatsApp', sub: whatsapp.handle, Icon: WhatsappIcon },
+                { href: linkedin.href, label: 'LinkedIn', sub: linkedin.handle, Icon: LinkedinIcon },
+                { href: github.href, label: 'GitHub', sub: github.handle, Icon: GithubIcon },
+              ].map(({ href, label, sub, Icon }) => (
                 <li key={label} data-reveal="up">
                   <motion.a
                     href={href}
-                    target={external ? '_blank' : undefined}
-                    rel={external ? 'noopener noreferrer' : undefined}
-                    download={external ? undefined : true}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     whileHover={{ y: -4 }}
-                    className="group flex h-full flex-col gap-6 rounded-sm border border-paper/15 bg-ink-2/60 p-5 transition-colors hover:border-crimson hover:bg-crimson"
+                    className="group flex h-full flex-col gap-6 rounded-sm border border-paper/15 bg-ink-2/60 p-5 transition-colors hover:border-accent hover:bg-accent"
                   >
                     <Icon size={22} />
                     <span>
@@ -198,6 +197,30 @@ export function Contact() {
                   </motion.a>
                 </li>
               ))}
+              {/* Résumé card opens the preview; its corner button downloads straight away */}
+              <li data-reveal="up">
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  className="group relative h-full rounded-sm border border-paper/15 bg-ink-2/60 transition-colors hover:border-accent hover:bg-accent"
+                >
+                  <button type="button" onClick={openResume} className="flex h-full w-full flex-col gap-6 p-5 text-left">
+                    <FileText size={22} />
+                    <span>
+                      <span className="block font-display text-2xl uppercase">Résumé</span>
+                      <span className="label block truncate text-paper/60 group-hover:text-paper">View · PDF</span>
+                    </span>
+                  </button>
+                  <a
+                    href={profile.resumeUrl}
+                    download
+                    aria-label="Download résumé (PDF)"
+                    title="Download résumé"
+                    className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full border border-paper/25 transition-colors hover:border-paper hover:bg-paper hover:text-ink"
+                  >
+                    <Download size={18} />
+                  </a>
+                </motion.div>
+              </li>
             </ul>
           </div>
 
@@ -224,7 +247,7 @@ export function Contact() {
                 </motion.p>
               )}
               {status === 'error' && (
-                <motion.p key="error" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-sm text-crimson" role="alert">
+                <motion.p key="error" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-sm text-accent" role="alert">
                   Something went wrong sending that. Please email me directly at{' '}
                   <a className="underline underline-offset-4" href={`mailto:${profile.email}`}>
                     {profile.email}

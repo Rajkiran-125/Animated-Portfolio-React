@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import { useGsap } from '@/animations/useGsap';
 import { registerReveals } from '@/animations/reveals';
 import { MagneticButton } from '@/components/ui/MagneticButton';
@@ -6,6 +6,7 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import { Crest } from '@/components/ui/Crest';
 import { profile, stats } from '@/data/profile';
 import { gsap } from '@/lib/gsap';
+import { openResume } from '@/lib/resume';
 
 const STATEMENT =
   'Full stack developer building scalable, production-ready web apps — from the stored procedure to the last pixel.';
@@ -57,7 +58,7 @@ export function About() {
   });
 
   return (
-    <section id="about" ref={scope} data-theme="paper" className="relative overflow-hidden bg-paper py-24 outline-none md:py-36" aria-labelledby="about-title">
+    <section id="about" ref={scope} data-surface="paper" className="relative overflow-hidden bg-paper py-24 outline-none md:py-36" aria-labelledby="about-title">
       <div
         className="about-ghost display outline-text pointer-events-none absolute -right-[5vw] top-10 select-none whitespace-nowrap text-[26vw] text-ink/[0.07]"
         aria-hidden="true"
@@ -66,14 +67,14 @@ export function About() {
       </div>
 
       <div className="frame relative">
-        <SectionLabel index="01" title="About" className="text-crimson" />
+        <SectionLabel index="01" title="About" className="text-accent" />
         <h2 id="about-title" className="sr-only">
           About {profile.fullName}
         </h2>
 
         <p className="stmt mt-10 max-w-[22ch] font-sans text-[clamp(2rem,5vw,4.6rem)] font-semibold leading-[1.02] tracking-tight md:mt-14">
           {STATEMENT.split(' ').map((w, i) => (
-            <span key={i} className={`stmt-word ${ACCENT.has(w) ? 'text-crimson' : ''}`}>
+            <span key={i} className={`stmt-word ${ACCENT.has(w) ? 'text-accent' : ''}`}>
               {w}{' '}
             </span>
           ))}
@@ -122,7 +123,7 @@ export function About() {
                   <div key={s.label} data-reveal="up">
                     <dt className="sr-only">{s.label}</dt>
                     <dd>
-                      <span className="display block text-[clamp(3rem,7vw,5.5rem)] text-crimson">
+                      <span className="display block text-[clamp(3rem,7vw,5.5rem)] text-accent">
                         <span data-count={n}>{n}</span>
                         {suffix}
                       </span>
@@ -135,9 +136,12 @@ export function About() {
               })}
             </dl>
 
-            <div className="mt-10" data-reveal="up">
-              <MagneticButton href={profile.resumeUrl} download variant="ink" icon={<Download size={17} />}>
-                Download résumé
+            <div className="mt-10 flex flex-wrap gap-3" data-reveal="up">
+              <MagneticButton onClick={openResume} variant="ink" icon={<FileText size={17} />}>
+                Résumé
+              </MagneticButton>
+              <MagneticButton href={profile.resumeUrl} download variant="ghost" icon={<Download size={17} />} ariaLabel="Download résumé (PDF)">
+                Download
               </MagneticButton>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 
 interface Props {
   text: string;
-  /** Words to tint crimson (matched case-insensitively, punctuation ignored) */
+  /** Words to tint in the accent colour (matched case-insensitively, punctuation ignored) */
   accent?: string[];
   wordClassName?: string;
 }
@@ -23,7 +23,7 @@ export function SplitWords({ text, accent = [], wordClassName = '' }: Props) {
           return (
             <Fragment key={i}>
               <span className="line-mask inline-block align-top">
-                <span className={`word ${isAccent ? 'text-crimson' : ''} ${wordClassName}`}>{word}</span>
+                <span className={`word ${isAccent ? 'text-accent' : ''} ${wordClassName}`}>{word}</span>
               </span>
               {i < words.length - 1 && ' '}
             </Fragment>

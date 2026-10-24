@@ -1,20 +1,26 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from '@/lib/gsap';
 import { useCanHover, usePrefersReducedMotion } from '@/hooks/useMediaQuery';
+import { subscribeTheme } from '@/theme/theme';
 
-type Theme = 'paper' | 'crimson' | 'ink';
+type Surface = 'paper' | 'accent' | 'ink';
 
-const THEMES: Record<Theme, { ring: string; dot: string; fill: string; label: string }> = {
-  paper: { ring: 'rgb(17 14 14)', dot: 'rgb(226 27 35)', fill: 'rgb(226 27 35)', label: 'rgb(239 231 218)' },
-  crimson: { ring: 'rgb(239 231 218)', dot: 'rgb(239 231 218)', fill: 'rgb(17 14 14)', label: 'rgb(239 231 218)' },
-  ink: { ring: 'rgb(239 231 218)', dot: 'rgb(226 27 35)', fill: 'rgb(226 27 35)', label: 'rgb(239 231 218)' },
-};
+/** Cursor colours for a surface, read from the colour-theme tokens in effect on `el`. */
+function colorsFor(surface: Surface, el: Element) {
+  const style = getComputedStyle(el);
+  const token = (name: string) => `rgb(${style.getPropertyValue(name).trim()})`;
+  const [paper, ink, accent] = [token('--paper'), token('--ink'), token('--accent')];
+  if (surface === 'accent') return { ring: paper, dot: paper, fill: ink, label: paper };
+  if (surface === 'ink') return { ring: paper, dot: token('--accent-text'), fill: accent, label: paper };
+  return { ring: ink, dot: accent, fill: accent, label: paper };
+}
 
 /**
  * Two-part cursor (dot + lagging ring). Positions are driven by gsap.quickTo,
  * hover state by event delegation — zero React renders after mount.
  * Elements opt in with data-cursor="hover" | "view" and data-cursor-label.
- * Sections declare data-theme so the cursor stays legible on any background.
+ * Sections declare data-surface so the cursor stays legible on any background,
+ * and it repaints when the colour theme changes.
  */
 export function Cursor() {
   const canHover = useCanHover();
@@ -39,11 +45,12 @@ export function Cursor() {
     const dotY = gsap.quickTo(dotEl, 'y', { duration: 0.08, ease: 'none' });
 
     let visible = false;
-    let theme: Theme = 'paper';
+    let surface: Surface = 'paper';
+    let surfaceEl: Element = root;
+    let t = colorsFor(surface, surfaceEl);
     let mode: 'default' | 'hover' | 'view' = 'default';
 
     const paint = () => {
-      const t = THEMES[theme];
       ringEl.style.setProperty('--ring', t.ring);
       ringEl.style.setProperty('--fill', t.fill);
       labelEl.style.color = t.label;
@@ -76,7 +83,10 @@ export function Cursor() {
     const onOver = (e: MouseEvent) => {
       const target = e.target as Element | null;
       if (!target?.closest) return;
-      const nextTheme = (target.closest('[data-theme]')?.getAttribute('data-theme') as Theme) || 'paper';
+      // Pointer events stop at an iframe (the résumé preview): hide until the pointer comes back out
+      if (target.tagName === 'IFRAME') return onLeave();
+      const nextSurfaceEl = target.closest('[data-surface]');
+      const nextSurface = (nextSurfaceEl?.getAttribute('data-surface') as Surface) || 'paper';
       const interactive = target.closest<HTMLElement>('[data-cursor], a, button, input, textarea, [role="button"]');
       let nextMode: typeof mode = 'default';
       if (interactive) {
@@ -88,9 +98,13 @@ export function Cursor() {
           nextMode = 'hover';
         }
       }
-      if (nextMode !== mode || nextTheme !== theme) {
+      if (nextMode !== mode || nextSurface !== surface) {
+        if (nextSurface !== surface) {
+          surface = nextSurface;
+          surfaceEl = nextSurfaceEl ?? root;
+          t = colorsFor(surface, surfaceEl);
+        }
         mode = nextMode;
-        theme = nextTheme;
         paint();
       }
     };
@@ -103,6 +117,10 @@ export function Cursor() {
     const onUp = () => paint();
 
     paint();
+    const unsubscribeTheme = subscribeTheme(() => {
+      t = colorsFor(surface, surfaceEl);
+      paint();
+    });
     window.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('mouseover', onOver, { passive: true });
     document.documentElement.addEventListener('mouseleave', onLeave);
@@ -111,6 +129,7 @@ export function Cursor() {
 
     return () => {
       root.classList.remove('has-cursor');
+      unsubscribeTheme();
       window.removeEventListener('pointermove', onMove);
       document.removeEventListener('mouseover', onOver);
       document.documentElement.removeEventListener('mouseleave', onLeave);

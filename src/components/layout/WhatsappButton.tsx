@@ -10,8 +10,8 @@ const ease = [0.16, 1, 0.3, 1] as const;
 /**
  * Floating WhatsApp shortcut pinned bottom-right once the preloader is gone.
  * It steps aside while the footer is on screen: the footer already has a
- * WhatsApp icon and the back-to-top disc in that corner, and a crimson disc
- * would vanish against the crimson footer anyway.
+ * WhatsApp icon and the back-to-top disc in that corner, and an accent disc
+ * would vanish against the accent footer anyway.
  * z-[92]: above the grain (90), below the mobile menu (95) and navbar (100).
  */
 export function WhatsappButton({ ready }: { ready: boolean }) {
@@ -43,9 +43,9 @@ export function WhatsappButton({ ready }: { ready: boolean }) {
           transition={{ duration: 0.5, ease }}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.92 }}
-          className="group fixed bottom-5 right-5 z-[92] grid h-14 w-14 place-items-center rounded-full bg-crimson text-paper shadow-[0_12px_30px_-12px_rgb(17_14_14/0.6)] md:bottom-8 md:right-8"
+          className="group fixed bottom-5 right-5 z-[92] grid h-14 w-14 place-items-center rounded-full bg-accent text-paper shadow-[0_12px_30px_-12px_rgb(var(--ink)/0.6)] md:bottom-8 md:right-8"
         >
-          <span className="pulse-ring absolute inset-0 rounded-full bg-crimson group-hover:hidden" aria-hidden="true" />
+          <span className="pulse-ring absolute inset-0 rounded-full bg-accent group-hover:hidden" aria-hidden="true" />
           <WhatsappIcon size={26} className="relative" />
           {/* hover-capable devices only, so a tap on a phone doesn't leave it stuck open */}
           <span

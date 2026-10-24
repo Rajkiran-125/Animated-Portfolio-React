@@ -3,7 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { useRef, type MouseEvent, type ReactNode } from 'react';
 import { useCanHover, usePrefersReducedMotion } from '@/hooks/useMediaQuery';
 
-type Variant = 'crimson' | 'ink' | 'paper' | 'ghost';
+type Variant = 'accent' | 'ink' | 'paper' | 'ghost';
 
 interface Props {
   children: ReactNode;
@@ -21,16 +21,16 @@ interface Props {
 }
 
 const styles: Record<Variant, string> = {
-  crimson: 'bg-crimson text-paper on-crimson',
+  accent: 'bg-accent text-paper on-accent',
   ink: 'bg-ink text-paper',
   paper: 'bg-paper text-ink',
   ghost: 'border border-current bg-transparent',
 };
 
 const fills: Record<Variant, string> = {
-  crimson: 'bg-ink',
-  ink: 'bg-crimson',
-  paper: 'bg-crimson',
+  accent: 'bg-ink',
+  ink: 'bg-accent',
+  paper: 'bg-accent',
   ghost: 'bg-ink',
 };
 
@@ -42,7 +42,7 @@ export function MagneticButton({
   children,
   href,
   onClick,
-  variant = 'crimson',
+  variant = 'accent',
   icon = <ArrowUpRight size={18} strokeWidth={2.2} />,
   external,
   download,

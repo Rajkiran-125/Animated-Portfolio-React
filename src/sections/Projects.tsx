@@ -18,7 +18,7 @@ function Preview({ project }: { project: Project }) {
     <TiltFrame className="w-full">
       <div className="flex aspect-[16/11] flex-col overflow-hidden rounded-md border-2 border-ink bg-ink shadow-[10px_10px_0_rgb(var(--ink))]">
         <div className="flex items-center gap-1.5 px-3 py-2.5" aria-hidden="true">
-          <span className="h-2.5 w-2.5 rounded-full bg-crimson" />
+          <span className="h-2.5 w-2.5 rounded-full bg-accent" />
           <span className="h-2.5 w-2.5 rounded-full bg-paper/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-paper/30" />
           <span className="label ml-3 truncate text-[0.62rem] text-paper/60">
@@ -35,7 +35,7 @@ function Preview({ project }: { project: Project }) {
             decoding="async"
             className="proj-img absolute inset-0 h-full w-full scale-[1.04] object-cover object-left-top transition-transform duration-700 group-hover:scale-100"
           />
-          <div className="absolute inset-0 bg-crimson/20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-0" />
+          <div className="absolute inset-0 bg-accent/20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-0" />
         </div>
       </div>
     </TiltFrame>
@@ -62,7 +62,7 @@ function ProjectPanel({ project }: { project: Project }) {
   return (
     <article
       className="proj-panel on-paper relative grid w-full shrink-0 gap-8 rounded-sm bg-paper p-5 text-ink sm:p-8 lg:grid-cols-[1.25fr_1fr] lg:gap-10 lg:p-10 lg:motion-safe:h-[min(76vh,700px)] lg:motion-safe:w-[min(84vw,1180px)]"
-      data-theme="paper"
+      data-surface="paper"
       aria-labelledby={`proj-${project.id}`}
     >
       <div className="relative flex items-center">
@@ -74,7 +74,7 @@ function ProjectPanel({ project }: { project: Project }) {
           <span className="display outline-text text-6xl text-ink md:text-7xl">{project.index}</span>
           <span className="label mt-2 text-right text-ash">{project.context}</span>
         </div>
-        <h3 id={`proj-${project.id}`} className="display mt-4 text-[clamp(2.4rem,4.4vw,4.2rem)] text-crimson">
+        <h3 id={`proj-${project.id}`} className="display mt-4 text-[clamp(2.4rem,4.4vw,4.2rem)] text-accent">
           {project.title}
         </h3>
         <p className="font-serif text-xl italic text-ink/80 md:text-2xl">{project.subtitle}</p>
@@ -82,7 +82,7 @@ function ProjectPanel({ project }: { project: Project }) {
         <ul className="mt-4 space-y-1.5 text-sm leading-snug text-ink/75">
           {project.highlights.map((h) => (
             <li key={h} className="flex gap-2.5">
-              <span className="mt-[0.45em] h-1.5 w-1.5 shrink-0 bg-crimson" aria-hidden />
+              <span className="mt-[0.45em] h-1.5 w-1.5 shrink-0 bg-accent" aria-hidden />
               {h}
             </li>
           ))}
@@ -150,9 +150,9 @@ export function Projects() {
   });
 
   return (
-    <section id="projects" ref={scope} data-theme="crimson" className="on-crimson relative bg-crimson text-paper outline-none" aria-labelledby="projects-title">
+    <section id="projects" ref={scope} data-surface="accent" className="on-accent relative bg-accent text-paper outline-none" aria-labelledby="projects-title">
       <div className="bg-ink">
-        <TornEdge className="text-crimson" seed={23} />
+        <TornEdge className="text-accent" seed={23} />
       </div>
 
       <div className="proj-pin relative overflow-hidden lg:motion-safe:flex lg:motion-safe:h-[100svh] lg:motion-safe:items-center">

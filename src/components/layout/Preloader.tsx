@@ -7,7 +7,7 @@ interface Props {
 }
 
 /**
- * Entrance curtain: counts to 100 while fonts load, then the crimson panel
+ * Entrance curtain: counts to 100 while fonts load, then the accent panel
  * lifts away. Owned entirely by one GSAP timeline.
  */
 export function Preloader({ onDone }: Props) {
@@ -71,8 +71,8 @@ export function Preloader({ onDone }: Props) {
   return (
     <div
       ref={root}
-      data-theme="crimson"
-      className="on-crimson fixed inset-0 z-[160] flex flex-col justify-between bg-crimson p-[var(--gutter)] text-paper"
+      data-surface="accent"
+      className="on-accent fixed inset-0 z-[160] flex flex-col justify-between bg-accent p-[var(--gutter)] text-paper"
       role="status"
       aria-label="Loading portfolio"
     >

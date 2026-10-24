@@ -4,17 +4,81 @@
 
 /* ─── Design tokens ─────────────────────────────────────────────── */
 :root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --nav-h: 72px;
+  --gutter: clamp(1rem, 4vw, 3.5rem);
+}
+
+/* ─── Colour themes ─────────────────────────────────────────────────
+   Every theme sets the same tokens as "R G B" so Tailwind can add alpha
+   (bg-accent/20). <html data-theme> picks the theme (src/theme/theme.ts);
+   any element with data-theme previews that theme, as the picker swatches do.
+   The new accents are mid-tones, as dark as they can be while ink text on
+   them still reaches 3:1, so paper text on an accent fill (and accent text
+   on paper) reaches at least 4.5:1. `accent-on-ink` is a lighter tint for
+   accent text on ink sections. Canvas / 3D palettes: src/theme/themes.ts. */
+:root,
+[data-theme='red'] {
+  /* the original palette, unchanged */
   --paper: 239 231 218; /* #EFE7DA bone paper */
   --paper-2: 226 215 198;
   --ink: 17 14 14; /* #110E0E */
   --ink-2: 32 26 26;
-  --crimson: 226 27 35; /* #E21B23 */
-  --crimson-deep: 140 10 16;
-  --ash: 104 96 90; /* muted text on paper, 4.9:1 */
+  --accent: 226 27 35; /* #E21B23 crimson */
+  --accent-deep: 140 10 16;
+  --accent-on-ink: 226 27 35;
+  --ash: 104 96 90; /* muted text on paper, 5:1 */
+}
+[data-theme='mono'] {
+  --paper: 245 245 244; /* #F5F5F4 */
+  --paper-2: 228 228 227;
+  --ink: 8 8 8; /* #080808 */
+  --ink-2: 30 30 30;
+  --accent: 96 96 96; /* #606060 graphite — 5.8:1 on paper */
+  --accent-deep: 56 56 56;
+  --accent-on-ink: 168 168 168; /* 8.4:1 on ink */
+  --ash: 82 82 82; /* 7.2:1 */
+}
+[data-theme='blue'] {
+  --paper: 234 239 246; /* #EAEFF6 cool paper */
+  --paper-2: 216 225 238;
+  --ink: 8 13 26; /* #080D1A navy ink */
+  --ink-2: 20 28 46;
+  --accent: 33 94 226; /* #215EE2 — 4.8:1 on paper */
+  --accent-deep: 16 48 140;
+  --accent-on-ink: 110 160 255; /* 7.5:1 on ink */
+  --ash: 80 91 112; /* 5.9:1 */
+}
+[data-theme='purple'] {
+  --paper: 239 235 246; /* #EFEBF6 lilac paper */
+  --paper-2: 226 218 238;
+  --ink: 16 11 24; /* #100B18 plum ink */
+  --ink-2: 30 22 42;
+  --accent: 124 58 232; /* #7C3AE8 — 4.9:1 on paper */
+  --accent-deep: 72 28 150;
+  --accent-on-ink: 178 146 255; /* 7.8:1 on ink */
+  --ash: 98 90 112; /* 5.6:1 */
+}
+[data-theme='green'] {
+  --paper: 233 240 233; /* #E9F0E9 sage paper */
+  --paper-2: 216 228 218;
+  --ink: 8 18 13; /* #08120D forest ink */
+  --ink-2: 18 32 25;
+  --accent: 18 124 72; /* #127C48 — 4.5:1 on paper */
+  --accent-deep: 8 70 40;
+  --accent-on-ink: 84 214 140; /* 10:1 on ink */
+  --ash: 80 96 88; /* 5.7:1 */
+}
 
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --nav-h: 72px;
-  --gutter: clamp(1rem, 4vw, 3.5rem);
+/* `text-accent` reads --accent-text (tailwind.config.ts): the accent itself,
+   except on ink sections. Fills and borders always use --accent. */
+:root,
+[data-theme],
+[data-surface] {
+  --accent-text: var(--accent);
+}
+[data-surface='ink'] {
+  --accent-text: var(--accent-on-ink);
 }
 
 @layer base {
@@ -28,18 +92,18 @@
     text-rendering: optimizeLegibility;
   }
   ::selection {
-    @apply bg-crimson text-paper;
+    @apply bg-accent text-paper;
   }
   :focus-visible {
-    outline: 2px solid rgb(var(--crimson));
+    outline: 2px solid rgb(var(--accent-text));
     outline-offset: 3px;
     border-radius: 2px;
   }
-  .on-crimson :focus-visible,
-  .on-crimson:focus-visible {
+  .on-accent :focus-visible,
+  .on-accent:focus-visible {
     outline-color: rgb(var(--paper));
   }
-  .on-crimson .on-paper :focus-visible {
+  .on-accent .on-paper :focus-visible {
     outline-color: rgb(var(--ink));
   }
   img {
@@ -118,6 +182,33 @@
   z-index: 90;
   opacity: 0.09;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Theme picker swatch: half accent, a quarter each of ink and paper.
+   Rendered with its own data-theme, so it shows that theme's tokens. */
+.theme-swatch {
+  background: conic-gradient(from 225deg, rgb(var(--accent)) 0 50%, rgb(var(--ink)) 0 75%, rgb(var(--paper)) 0);
+  box-shadow:
+    0 0 0 2px rgb(var(--paper)),
+    0 0 0 3px rgb(var(--ink) / 0.18);
+}
+
+/* Theme switch, View Transitions path: the new theme grows as a circle
+   (animated from src/theme/theme.ts) over a snapshot of the old one. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Theme switch fallback for browsers without View Transitions: fade colours
+   only. Transforms and opacity are left alone; GSAP and Framer own those. */
+html.theme-fade *,
+html.theme-fade *::before,
+html.theme-fade *::after {
+  transition-property: color, background-color, border-color, outline-color, fill, stroke, box-shadow, -webkit-text-stroke-color !important;
+  transition-duration: 0.5s !important;
+  transition-timing-function: var(--ease-out) !important;
 }
 
 @keyframes marquee {

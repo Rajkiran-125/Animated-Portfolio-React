@@ -14,18 +14,14 @@ import {
   type Points as ThreePoints,
 } from 'three';
 import type { RenderTier } from '@/lib/device';
+import { useTheme } from '@/theme/theme';
+import { DEFAULT_THEME, THEMES } from '@/theme/themes';
 import { MONITOR_SNIPPET, TERMINAL_SNIPPET, WINDOW_SNIPPETS, createCodeTexture } from './codeTexture';
 
-/* ─── Palette & shared toon ramp ─────────────────────────────────────── */
-const C = {
-  ink: '#1b1616',
-  inkSoft: '#2a2323',
-  paper: '#f3ece0',
-  bone: '#d9cfc0',
-  crimson: '#e21b23',
-  crimsonDeep: '#a80f16',
-  outline: '#110e0e',
-};
+/* ─── Palette (follows the colour theme) & shared toon ramp ──────────── */
+const PaletteCtx = createContext(THEMES[DEFAULT_THEME]);
+const useScene = () => useContext(PaletteCtx).scene;
+const useCode = () => useContext(PaletteCtx).code;
 
 let ramp: DataTexture | null = null;
 function toonRamp() {
@@ -47,6 +43,7 @@ function Toon({ color }: { color: string }) {
 /** Ink outline — the inverted-hull pass is skipped on lite devices. */
 function Ink({ thickness = 0.018 }: { thickness?: number }) {
   const tier = useContext(TierCtx);
+  const C = useScene();
   if (tier !== 'full') return null;
   return <Outlines thickness={thickness} color={C.outline} />;
 }
@@ -74,9 +71,23 @@ function Cyl({ args, color, position, rotation }: { args: [number, number, numbe
 }
 
 /* ─── Screens ────────────────────────────────────────────────────────── */
-function useTypingScreen(snippet: typeof MONITOR_SNIPPET, opts: Parameters<typeof createCodeTexture>[1], speed: number, reduce: boolean) {
-  // Created once per mount; snippet/opts are static for each screen
-  const screen = useMemo(() => createCodeTexture(snippet, opts), []);
+/** Repaint a screen in the new colours when the theme changes. */
+function useScreenPalette(screen: ReturnType<typeof createCodeTexture>, progress: MutableRefObject<number>) {
+  const code = useCode();
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    screen.setPalette(code);
+    screen.draw(progress.current);
+    invalidate();
+  }, [screen, code, progress, invalidate]);
+}
+
+type ScreenOptions = Omit<Parameters<typeof createCodeTexture>[1], 'palette'>;
+
+function useTypingScreen(snippet: typeof MONITOR_SNIPPET, opts: ScreenOptions, speed: number, reduce: boolean) {
+  const code = useCode();
+  // Created once per mount; snippet/opts are static for each screen, colours follow via useScreenPalette
+  const screen = useMemo(() => createCodeTexture(snippet, { ...opts, palette: code }), []);
   const invalidate = useThree((s) => s.invalidate);
   const progress = useRef(reduce ? 1 : 0);
   // Accumulated deltas, not clock timestamps: R3F resets clock.elapsedTime to 0
@@ -93,6 +104,7 @@ function useTypingScreen(snippet: typeof MONITOR_SNIPPET, opts: Parameters<typeo
       invalidate();
     });
   }, [screen, invalidate]);
+  useScreenPalette(screen, progress);
   useFrame((_, delta) => {
     if (reduce) return;
     sinceDraw.current += delta;
@@ -123,6 +135,7 @@ function useTypingScreen(snippet: typeof MONITOR_SNIPPET, opts: Parameters<typeo
 }
 
 function Monitor({ reduce }: { reduce: boolean }) {
+  const C = useScene();
   const screen = useTypingScreen(MONITOR_SNIPPET, { width: 1024, height: 600, fontSize: 26 }, 0.12, reduce);
   return (
     <group position={[-0.15, 0, -0.35]}>
@@ -140,6 +153,7 @@ function Monitor({ reduce }: { reduce: boolean }) {
 }
 
 function Laptop({ reduce }: { reduce: boolean }) {
+  const C = useScene();
   const screen = useTypingScreen(TERMINAL_SNIPPET, { width: 640, height: 400, fontSize: 24 }, 0.2, reduce);
   return (
     <group position={[1.25, 0.03, 0.25]} rotation={[0, -0.45, 0]}>
@@ -157,6 +171,7 @@ function Laptop({ reduce }: { reduce: boolean }) {
 }
 
 function Mug() {
+  const C = useScene();
   const steam = useRef<Group>(null);
   useFrame(({ clock }) => {
     if (!steam.current) return;
@@ -169,10 +184,10 @@ function Mug() {
   });
   return (
     <group position={[-1.45, 0.03, 0.3]}>
-      <Cyl args={[0.13, 0.11, 0.28]} color={C.crimson} position={[0, 0.14, 0]} />
+      <Cyl args={[0.13, 0.11, 0.28]} color={C.accent} position={[0, 0.14, 0]} />
       <mesh position={[0.15, 0.15, 0]} rotation={[0, 0, Math.PI / 2]}>
         <torusGeometry args={[0.07, 0.022, 10, 20]} />
-        <Toon color={C.crimson} />
+        <Toon color={C.accent} />
         <Ink thickness={0.012} />
       </mesh>
       <group ref={steam}>
@@ -188,6 +203,7 @@ function Mug() {
 }
 
 function Lamp() {
+  const C = useScene();
   return (
     <group position={[-1.5, 0.03, -0.45]}>
       <Cyl args={[0.16, 0.18, 0.05]} color={C.ink} position={[0, 0.025, 0]} />
@@ -196,7 +212,7 @@ function Lamp() {
       <group position={[0.6, 0.86, 0]} rotation={[0, 0, -2.2]}>
         <mesh>
           <coneGeometry args={[0.17, 0.26, 24, 1, true]} />
-          <meshToonMaterial color={C.crimson} gradientMap={toonRamp()} side={2} />
+          <meshToonMaterial color={C.accent} gradientMap={toonRamp()} side={2} />
           <Ink thickness={0.012} />
         </mesh>
         <mesh position={[0, -0.08, 0]}>
@@ -210,9 +226,10 @@ function Lamp() {
 }
 
 function Books() {
+  const C = useScene();
   return (
     <group position={[1.55, 0.03, -0.45]} rotation={[0, 0.25, 0]}>
-      <Box args={[0.5, 0.09, 0.36]} color={C.crimson} position={[0, 0.045, 0]} />
+      <Box args={[0.5, 0.09, 0.36]} color={C.accent} position={[0, 0.045, 0]} />
       <Box args={[0.46, 0.08, 0.34]} color={C.paper} position={[0.02, 0.13, 0]} rotation={[0, -0.12, 0]} />
       <Box args={[0.42, 0.1, 0.32]} color={C.ink} position={[-0.01, 0.22, 0]} rotation={[0, 0.1, 0]} />
     </group>
@@ -220,6 +237,7 @@ function Books() {
 }
 
 function Desk({ reduce }: { reduce: boolean }) {
+  const C = useScene();
   return (
     <group>
       <Box args={[3.9, 0.1, 1.55]} color={C.ink} position={[0, -0.05, 0]} />
@@ -266,8 +284,11 @@ function setCursor(e: ThreeEvent<PointerEvent>, label: string | null) {
 
 /** Code window that swaps snippet on click and pops toward the camera on hover. */
 function CodeWindow({ position, rotation, start, reduce, size = 1 }: { position: V3; rotation: V3; start: number; reduce: boolean; size?: number }) {
+  const C = useScene();
+  const code = useCode();
   const idx = useRef(start);
-  const screen = useMemo(() => createCodeTexture(WINDOW_SNIPPETS[start], { width: 560, height: 360, fontSize: 22 }), [start]);
+  // Colours follow the theme via useScreenPalette, so they don't recreate the texture
+  const screen = useMemo(() => createCodeTexture(WINDOW_SNIPPETS[start], { width: 560, height: 360, fontSize: 22, palette: code }), [start]);
   const group = useRef<Group>(null);
   const hovered = useRef(false);
   const flip = useRef(0);
@@ -282,6 +303,7 @@ function CodeWindow({ position, rotation, start, reduce, size = 1 }: { position:
       invalidate();
     });
   }, [screen, invalidate]);
+  useScreenPalette(screen, progress);
 
   useFrame((_, delta) => {
     const g = group.current;
@@ -376,16 +398,18 @@ function Toy({ children, position, size, reduce }: { children: ReactNode; positi
 }
 
 function Database() {
+  const C = useScene();
   return (
     <group scale={0.9}>
       {[0, 0.2, 0.4].map((y, i) => (
-        <Cyl key={y} args={[0.26, 0.26, 0.16, 28]} color={i === 1 ? C.paper : C.crimson} position={[0, y, 0]} />
+        <Cyl key={y} args={[0.26, 0.26, 0.16, 28]} color={i === 1 ? C.paper : C.accent} position={[0, y, 0]} />
       ))}
     </group>
   );
 }
 
 function Particles({ count }: { count: number }) {
+  const C = useScene();
   const ref = useRef<ThreePoints>(null);
   const geometry = useMemo(() => {
     const g = new BufferGeometry();
@@ -404,7 +428,7 @@ function Particles({ count }: { count: number }) {
   });
   return (
     <points ref={ref} geometry={geometry}>
-      <pointsMaterial color={C.crimson} size={0.035} sizeAttenuation transparent opacity={0.85} depthWrite={false} blending={AdditiveBlending} />
+      <pointsMaterial color={C.accent} size={0.035} sizeAttenuation transparent opacity={0.85} depthWrite={false} blending={AdditiveBlending} />
     </points>
   );
 }
@@ -531,6 +555,7 @@ function World({
   pointer: MutableRefObject<PointerState>;
   bounds: SceneBounds;
 }) {
+  const C = useScene();
   const desk = useRef<Group>(null);
   const layout = useLayout(tier, bounds);
   useFrame((_, delta) => {
@@ -542,9 +567,10 @@ function World({
     <>
       <Rig pointer={pointer} reduce={reduce} />
       <ambientLight intensity={1.1} />
-      <hemisphereLight args={['#fff6ea', '#e21b23', 0.6]} />
+      {/* props, not args: a theme change then recolours the light instead of rebuilding it */}
+      <hemisphereLight color="#fff6ea" groundColor={C.accent} intensity={0.6} />
       <directionalLight position={[3.5, 5, 4]} intensity={2.4} />
-      <pointLight position={[-3.5, 1.5, 2]} color={C.crimson} intensity={6} distance={8} />
+      <pointLight position={[-3.5, 1.5, 2]} color={C.accent} intensity={6} distance={8} />
       <group ref={desk} position={layout.desk.position} scale={layout.desk.scale} rotation={[0, -0.12, 0]}>
         <Desk reduce={reduce} />
       </group>
@@ -568,7 +594,7 @@ function World({
       <Toy position={layout.torus} size={layout.toy} reduce={reduce}>
         <mesh>
           <torusGeometry args={[0.2, 0.075, 14, 32]} />
-          <Toon color={C.crimson} />
+          <Toon color={C.accent} />
           <Ink />
         </mesh>
       </Toy>
@@ -587,6 +613,7 @@ export default function HeroScene({ tier, reduce, bounds }: HeroSceneProps) {
   const host = useRef<HTMLDivElement>(null);
   const pointer = useRef<PointerState>({ x: 0, y: 0, active: false });
   const [inView, setInView] = useState(true);
+  const theme = useTheme();
 
   // Pointer tracked across the whole window so the parallax works over DOM text too
   useEffect(() => {
@@ -623,7 +650,9 @@ export default function HeroScene({ tier, reduce, bounds }: HeroSceneProps) {
         style={{ touchAction: 'pan-y' }}
       >
         <TierCtx.Provider value={tier}>
-          <World tier={tier} reduce={reduce} pointer={pointer} bounds={bounds} />
+          <PaletteCtx.Provider value={THEMES[theme]}>
+            <World tier={tier} reduce={reduce} pointer={pointer} bounds={bounds} />
+          </PaletteCtx.Provider>
         </TierCtx.Provider>
       </Canvas>
     </div>

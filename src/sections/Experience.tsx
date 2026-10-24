@@ -43,11 +43,11 @@ export function Experience() {
   });
 
   return (
-    <section id="experience" ref={scope} data-theme="paper" className="grid-paper relative py-24 outline-none md:py-36" aria-labelledby="experience-title">
+    <section id="experience" ref={scope} data-surface="paper" className="grid-paper relative py-24 outline-none md:py-36" aria-labelledby="experience-title">
       <div className="frame">
         <div className="grid gap-8 md:grid-cols-12">
           <div className="md:col-span-7">
-            <SectionLabel index="04" title="Journey" className="text-crimson" />
+            <SectionLabel index="04" title="Journey" className="text-accent" />
             <h2 id="experience-title" className="display mt-8 text-[clamp(3.6rem,10vw,9rem)]" data-split>
               <SplitWords text="Experience" />
             </h2>
@@ -60,7 +60,7 @@ export function Experience() {
         <div className="relative mt-16 md:mt-24">
           {/* spine */}
           <div className="absolute bottom-0 left-[15px] top-0 w-[2px] bg-ink/15 md:left-[calc(25%-1px)]" aria-hidden="true">
-            <div className="tl-fill h-full w-full origin-top scale-y-0 bg-crimson" />
+            <div className="tl-fill h-full w-full origin-top scale-y-0 bg-accent" />
           </div>
         <ol className="tl-list relative">
 
@@ -70,17 +70,17 @@ export function Experience() {
               <li key={entry.id} className="tl-row group relative grid gap-4 pb-16 pl-12 md:grid-cols-4 md:gap-10 md:pl-0">
                 {/* node */}
                 <span
-                  className="absolute left-0 top-1 grid h-8 w-8 place-items-center rounded-full border-2 border-ink bg-paper text-ink transition-colors duration-500 group-[.is-active]:border-crimson group-[.is-active]:bg-crimson group-[.is-active]:text-paper md:left-[calc(25%-16px)]"
+                  className="absolute left-0 top-1 grid h-8 w-8 place-items-center rounded-full border-2 border-ink bg-paper text-ink transition-colors duration-500 group-[.is-active]:border-accent group-[.is-active]:bg-accent group-[.is-active]:text-paper md:left-[calc(25%-16px)]"
                   aria-hidden="true"
                 >
                   <Icon size={14} />
                 </span>
 
                 <div className="tl-anim md:pr-12 md:text-right">
-                  <span className="display outline-text block text-6xl text-ink transition-colors duration-500 group-[.is-active]:text-crimson group-[.is-active]:[-webkit-text-fill-color:currentColor] md:text-7xl">
+                  <span className="display outline-text block text-6xl text-ink transition-colors duration-500 group-[.is-active]:text-accent group-[.is-active]:[-webkit-text-fill-color:currentColor] md:text-7xl">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span className="label mt-2 block text-crimson">{entry.period}</span>
+                  <span className="label mt-2 block text-accent">{entry.period}</span>
                 </div>
 
                 <div className="md:col-span-3 md:pl-12">
@@ -92,7 +92,7 @@ export function Experience() {
                     <ul className="tl-anim mt-5 max-w-3xl space-y-2.5 text-ink/80 md:text-lg">
                       {entry.points.map((p) => (
                         <li key={p} className="flex gap-3">
-                          <span className="mt-[0.6em] h-[2px] w-4 shrink-0 bg-crimson" aria-hidden />
+                          <span className="mt-[0.6em] h-[2px] w-4 shrink-0 bg-accent" aria-hidden />
                           {p}
                         </li>
                       ))}
@@ -123,10 +123,10 @@ export function Experience() {
               }}
               className="tl-anim group/next inline-flex items-center gap-4 md:col-span-3 md:pl-12"
             >
-              <span className="display text-[clamp(2rem,4vw,3.4rem)] text-ink/40 transition-colors group-hover/next:text-crimson">
+              <span className="display text-[clamp(2rem,4vw,3.4rem)] text-ink/40 transition-colors group-hover/next:text-accent">
                 Next chapter — your team?
               </span>
-              <ArrowRight className="text-crimson transition-transform group-hover/next:translate-x-2" size={32} />
+              <ArrowRight className="text-accent transition-transform group-hover/next:translate-x-2" size={32} />
             </a>
           </li>
         </ol>

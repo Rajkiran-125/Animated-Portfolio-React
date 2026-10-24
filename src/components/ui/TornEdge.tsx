@@ -33,7 +33,7 @@ function buildRip(seed: number) {
 }
 
 /** A torn-paper edge used to stitch sections together. */
-export function TornEdge({ className = 'text-crimson', flip = false, seed = 7, height = 48 }: Props) {
+export function TornEdge({ className = 'text-accent', flip = false, seed = 7, height = 48 }: Props) {
   const d = useMemo(() => buildRip(seed), [seed]);
   const fiber = useMemo(() => buildRip(seed + 1), [seed]);
   return (

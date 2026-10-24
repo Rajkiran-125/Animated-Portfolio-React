@@ -1,6 +1,6 @@
 import type { Config } from 'tailwindcss';
 
-// Colours / fonts are defined once as CSS variables in src/styles/tokens.css
+// Colours are CSS variables, set per colour theme in src/styles/index.css
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
@@ -10,9 +10,13 @@ export default {
         'paper-2': 'rgb(var(--paper-2) / <alpha-value>)',
         ink: 'rgb(var(--ink) / <alpha-value>)',
         'ink-2': 'rgb(var(--ink-2) / <alpha-value>)',
-        crimson: 'rgb(var(--crimson) / <alpha-value>)',
-        'crimson-deep': 'rgb(var(--crimson-deep) / <alpha-value>)',
+        accent: 'rgb(var(--accent) / <alpha-value>)',
+        'accent-deep': 'rgb(var(--accent-deep) / <alpha-value>)',
         ash: 'rgb(var(--ash) / <alpha-value>)',
+      },
+      // Accent text gets a lighter tint on ink sections; fills and borders keep --accent
+      textColor: {
+        accent: 'rgb(var(--accent-text) / <alpha-value>)',
       },
       fontFamily: {
         display: ['Anton', 'Impact', 'Haettenschweiler', 'sans-serif'],

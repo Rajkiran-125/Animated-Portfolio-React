@@ -88,17 +88,17 @@ export function Skills() {
     <section
       id="skills"
       ref={scope}
-      data-theme="ink"
+      data-surface="ink"
       className="relative overflow-clip bg-ink py-24 text-paper outline-none md:py-36"
       aria-labelledby="skills-title"
     >
-      {/* faint crimson glow for depth (section clips rather than hides overflow, so the sticky column works) */}
-      <div className="pointer-events-none absolute -left-40 top-1/3 h-[520px] w-[520px] rounded-full bg-crimson/20 blur-[120px]" />
+      {/* faint accent glow for depth (section clips rather than hides overflow, so the sticky column works) */}
+      <div className="pointer-events-none absolute -left-40 top-1/3 h-[520px] w-[520px] rounded-full bg-accent/20 blur-[120px]" />
 
       <div className="frame relative grid gap-14 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-28">
-            <SectionLabel index="02" title="Skills" className="text-crimson" />
+            <SectionLabel index="02" title="Skills" className="text-accent" />
             <h2 id="skills-title" className="display mt-8 text-[clamp(3.6rem,9vw,8.5rem)]" data-split>
               <SplitWords text="The toolkit" accent={['toolkit']} />
             </h2>
@@ -109,7 +109,7 @@ export function Skills() {
             {/* sticky index — follows the reader down the list */}
             <nav aria-label="Skill categories" className="relative mt-12 hidden max-w-xs pl-6 lg:block" data-reveal="up">
               <div className="absolute bottom-2 left-0 top-2 w-[2px] bg-paper/15" aria-hidden="true">
-                <div className="sk-fill h-full w-full origin-top scale-y-0 bg-crimson" />
+                <div className="sk-fill h-full w-full origin-top scale-y-0 bg-accent" />
               </div>
               <ol>
                 {skillGroups.map((g, i) => (
@@ -120,7 +120,7 @@ export function Skills() {
                       data-sk-index={g.id}
                       className="group flex items-baseline gap-4 py-1.5 text-paper/35 transition-colors duration-500 hover:text-paper [&.is-active]:text-paper"
                     >
-                      <span className="label transition-colors duration-500 group-[.is-active]:text-crimson">{pad(i + 1)}</span>
+                      <span className="label transition-colors duration-500 group-[.is-active]:text-accent">{pad(i + 1)}</span>
                       <span className="display text-2xl transition-transform duration-500 group-[.is-active]:translate-x-1.5">{g.title}</span>
                       <span className="label ml-auto">{pad(g.skills.length)}</span>
                     </a>
@@ -145,12 +145,12 @@ export function Skills() {
               >
                 <header className="flex items-end justify-between gap-6" data-reveal="up">
                   <h3 id={`skills-${g.id}-title`} className="flex items-start gap-4">
-                    <span className="label mt-1 text-crimson">{pad(i + 1)}</span>
+                    <span className="label mt-1 text-accent">{pad(i + 1)}</span>
                     <span className="display outline-text text-[clamp(2.6rem,5vw,4.5rem)] transition-colors duration-500 group-[.is-active]:[-webkit-text-fill-color:currentColor]">
                       {g.title}
                     </span>
                   </h3>
-                  <span className="display text-5xl text-crimson md:text-6xl" aria-label={`${g.skills.length} skills`}>
+                  <span className="display text-5xl text-accent md:text-6xl" aria-label={`${g.skills.length} skills`}>
                     {pad(g.skills.length)}
                   </span>
                 </header>
@@ -167,7 +167,7 @@ export function Skills() {
                     >
                       {active ? (
                         <>
-                          <p className="label text-crimson">{active} — shipped in</p>
+                          <p className="label text-accent">{active} — shipped in</p>
                           <p className="mt-1.5 text-paper md:text-lg">
                             {usedIn.length ? usedIn.join('  ·  ') : 'Part of my everyday toolkit across projects'}
                           </p>
@@ -194,7 +194,7 @@ export function Skills() {
                           whileTap={{ scale: 0.95 }}
                           aria-pressed={on}
                           className={`rounded-full border px-4 py-2 font-display text-lg uppercase tracking-wide transition-colors duration-300 md:px-5 md:py-2.5 md:text-2xl ${
-                            on ? 'border-crimson bg-crimson text-paper' : 'border-paper/25 text-paper hover:border-paper'
+                            on ? 'border-accent bg-accent text-paper' : 'border-paper/25 text-paper hover:border-paper'
                           }`}
                         >
                           {skill}
@@ -214,7 +214,7 @@ export function Skills() {
           items={skillGroups.flatMap((g) => g.skills).filter((s, i, a) => a.indexOf(s) === i)}
           duration={60}
           reverse
-          separator={<span className="text-crimson">/</span>}
+          separator={<span className="text-accent">/</span>}
           itemClassName="display outline-text text-5xl text-paper/50 md:text-7xl"
         />
       </div>

@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Apply the saved colour theme before first paint (validated in src/theme/theme.ts)
+      try {
+        var theme = localStorage.getItem('rj-theme');
+        if (theme && /^[a-z]+$/.test(theme)) document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    </script>
     <title>Rajkiran Jaiswar — Full Stack Developer</title>
     <meta
       name="description"

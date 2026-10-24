@@ -18,8 +18,9 @@ Requires Node 18+. `dist/` is a static site that can be deployed to Firebase Hos
 |---|---|
 | `src/data/profile.ts` | **All content**: bio, skills, projects, timeline, links. Edit this to update the site. |
 | `src/types.ts` | Content types |
-| `src/styles/index.css` | Design tokens (`:root` colours), grain, grid paper, shared component classes |
+| `src/styles/index.css` | Design tokens (one colour block per theme), grain, grid paper, shared component classes |
 | `tailwind.config.ts` | Maps the CSS tokens to Tailwind colours and fonts |
+| `src/theme/*` | Colour themes: the list and the 3D / canvas palettes (`themes.ts`), the active-theme store (`theme.ts`) |
 | `src/sections/*` | Hero, About, Skills, Projects, Experience, Contact |
 | `src/components/layout/*` | Navbar, Footer, Preloader, Cursor, floating WhatsApp button |
 | `src/components/ui/*` | MagneticButton, TiltFrame, SplitWords, Marquee, TornEdge, Crest, icons |
@@ -34,6 +35,18 @@ Each element is animated by one library only:
 - **GSAP + ScrollTrigger**: preloader, hero intro, scroll reveals (`data-reveal`, `data-split`), pinned horizontal project gallery, timeline spine, parallax, custom cursor.
 - **Framer Motion**: UI state. That covers the nav active pill and mobile menu, magnetic buttons, tilt cards, skill tabs/chips and form feedback.
 - **React Three Fiber**: the hero workspace, which runs its own render loop.
+
+## Colour themes
+
+Five themes: Black & White, Red (default, the original palette), Blue, Purple and Green. Visitors switch with the swatch button in the navbar. The choice is saved in `localStorage` (`rj-theme`), applied before first paint by a small inline script in `index.html` so a reload never flashes red, and kept in step across open tabs.
+
+- **Page colours** are CSS variables (`--paper`, `--ink`, `--accent`, …), one block per `[data-theme]` in `src/styles/index.css`. Components only use the Tailwind names (`bg-accent`, `text-ink`), so they follow the theme automatically.
+- **`text-accent`** uses a lighter tint (`--accent-on-ink`) inside `data-surface="ink"` sections, so small accent text stays readable on dark backgrounds. Fills and borders keep `--accent`.
+- **WebGL scene, code screens and SVG fallback** can't read CSS, so their palettes are in `src/theme/themes.ts`.
+- **Contrast**: the new accents are mid-tones. Paper text on an accent fill, and accent text on paper, is at least 4.5:1, and ink on the accent is at least 3:1. Red is the original palette, kept unchanged at about 3.9:1 for those pairs.
+- **Switching** uses the View Transitions API: the new theme grows as a circle from the chosen option. Browsers without it cross-fade colours, and `prefers-reduced-motion` switches instantly.
+- **Adding a theme**: add its id to `THEME_IDS` with palettes in `src/theme/themes.ts`, and add a `[data-theme='<id>']` token block in `index.css`.
+- `data-surface="paper|accent|ink"` on sections is a different thing: it describes a section's background (used by the custom cursor and `text-accent`), not the colour theme.
 
 ## Performance & accessibility notes
 
