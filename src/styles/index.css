@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design tokens ─────────────────────────────────────────────── */
+:root {
+  --paper: 239 231 218; /* #EFE7DA bone paper */
+  --paper-2: 226 215 198;
+  --ink: 17 14 14; /* #110E0E */
+  --ink-2: 32 26 26;
+  --crimson: 226 27 35; /* #E21B23 */
+  --crimson-deep: 140 10 16;
+  --ash: 104 96 90; /* muted text on paper, 4.9:1 */
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --nav-h: 72px;
+  --gutter: clamp(1rem, 4vw, 3.5rem);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto;
+  }
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    overflow-x: clip;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection {
+    @apply bg-crimson text-paper;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--crimson));
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  .on-crimson :focus-visible,
+  .on-crimson:focus-visible {
+    outline-color: rgb(var(--paper));
+  }
+  .on-crimson .on-paper :focus-visible {
+    outline-color: rgb(var(--ink));
+  }
+  img {
+    @apply select-none;
+  }
+  /* Hide the native cursor only when the custom cursor is active */
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+}
+
+@layer components {
+  .frame {
+    @apply mx-auto w-full max-w-frame;
+    padding-inline: var(--gutter);
+  }
+
+  /* Display type — Anton, tight leading, never wraps mid-word */
+  .display {
+    @apply font-display uppercase;
+    line-height: 0.86;
+    letter-spacing: -0.01em;
+  }
+
+  .label {
+    @apply font-mono text-[0.7rem] uppercase tracking-[0.18em];
+  }
+
+  /* Grid paper, as in the printed reference */
+  .grid-paper {
+    background-color: rgb(var(--paper));
+    background-image:
+      linear-gradient(rgb(var(--ink) / 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--ink) / 0.055) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+  }
+
+  .outline-text {
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 1.5px currentColor;
+  }
+
+  /* Masked lines used by GSAP text reveals */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.04em;
+    margin-bottom: -0.04em;
+  }
+  .word {
+    display: inline-block;
+    will-change: transform;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-wider;
+  }
+
+  .skip-link {
+    @apply fixed left-4 top-4 z-[200] -translate-y-24 bg-ink px-4 py-2 font-mono text-sm text-paper transition-transform;
+  }
+  .skip-link:focus {
+    @apply translate-y-0;
+  }
+}
+
+/* Film grain — one static SVG noise tile, composited once.
+   The noise is pure black, so normal blending looks identical to multiply
+   without forcing the whole page (and the live 3D canvas) through a blend pass every frame. */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 30s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin-slow 24s linear infinite;
+}
+
+/* Halo on the floating WhatsApp button; the 70–100% hold is the pause between pulses */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  70%,
+  100% {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+.pulse-ring {
+  animation: pulse-ring 2.6s var(--ease-out) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .spin-slow,
+  .pulse-ring {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
